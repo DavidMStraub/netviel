@@ -108,5 +108,6 @@ def message_to_json(message):
         "date": email_msg["Date"],
         "subject": email_msg["Subject"],
         "content": email_msg.get_body().get_content(),
+        "content_type": email_msg.get_body().get_content_type(),
         "attachments": attachments,
     }
