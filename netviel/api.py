@@ -3,11 +3,12 @@
 
 import email
 import email.policy
+import io
 import logging
 import os
 
 import notmuch
-from flask import Flask, current_app, g
+from flask import Flask, current_app, g, send_file
 from flask_cors import CORS
 from flask_restful import Api, Resource
 
@@ -51,12 +52,25 @@ def create_app():
             threads = notmuch.Query(
                 get_db(), "thread:{}".format(thread_id)
             ).search_threads()
-            thread = next(threads)
+            thread = next(threads)  # there can be only 1
             messages = thread.get_messages()
             return messages_to_json(messages)
 
     api.add_resource(Query, "/api/query/<string:query_string>")
     api.add_resource(Thread, "/api/thread/<string:thread_id>")
+
+    @app.route("/api/attachment/<string:message_id>/<int:num>")
+    def download_attachment(message_id, num):
+        msgs = notmuch.Query(
+            get_db(), "mid:{}".format(message_id)
+        ).search_messages()
+        msg = next(msgs)  # there can be only 1
+        d = message_attachment(msg, num)
+        if not d:
+            return None
+        f = io.BytesIO(d["content"])
+        f.seek(0)
+        return send_file(f, mimetype=d["content_type"])
 
     return app
 
@@ -100,6 +114,7 @@ def message_to_json(message):
                     "content_type": part.get_content_type(),
                 }
             )
+    msg_body = email_msg.get_body(preferencelist=("html", "plain"))
     return {
         "from": email_msg["From"],
         "to": email_msg["To"],
@@ -107,7 +122,27 @@ def message_to_json(message):
         "bcc": email_msg["BCC"],
         "date": email_msg["Date"],
         "subject": email_msg["Subject"],
-        "content": email_msg.get_body().get_content(),
-        "content_type": email_msg.get_body().get_content_type(),
+        "content": msg_body.get_content(),
+        "content_type": msg_body.get_content_type(),
         "attachments": attachments,
+        "message_id": message.get_message_id(),
+    }
+
+
+def message_attachment(message, num):
+    """Returns attachment no. `num` of a `notmuch.message.Message` instance."""
+    with open(message.get_filename(), "rb") as f:
+        email_msg = email.message_from_binary_file(f, policy=email.policy.default)
+    attachments = []
+    for part in email_msg.walk():
+        if part.get_content_maintype() == "multipart":
+            continue
+        if part.get_content_disposition() == "attachment":
+            attachments.append(part)
+    if not attachments:
+        return {}
+    attachment = attachments[num]
+    return {
+        "content_type": attachment.get_content_type(),
+        "content": attachment.get_content(),
     }
