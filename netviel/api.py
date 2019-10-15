@@ -97,12 +97,22 @@ def create_app():
         f.seek(0)
         return send_file(f, mimetype=d["content_type"])
 
+    @app.route("/api/message/<string:message_id>")
+    def download_message(message_id):
+        msgs = notmuch.Query(get_db(), "mid:{}".format(message_id)).search_messages()
+        msg = next(msgs)  # there can be only 1
+        return send_file(msg.get_filename(), mimetype="message/rfc822")
+
     return app
 
 
 def threads_to_json(threads, start=0, number=None):
     """Converts a list of `notmuch.threads.Threads` instances to a JSON object."""
-    my_threads = itertools.islice(threads, start, start + number)
+    if number is None:
+        stop = None
+    else:
+        stop = start + number
+    my_threads = itertools.islice(threads, start, stop)
     return [thread_to_json(t) for t in my_threads]
 
 
