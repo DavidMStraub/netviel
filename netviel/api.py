@@ -1,6 +1,7 @@
 """Flask web app providing a REST API to notmuch."""
 
 
+import bleach
 import email
 import email.policy
 import io
@@ -11,6 +12,33 @@ import notmuch
 from flask import Flask, current_app, g, send_file
 from flask_cors import CORS
 from flask_restful import Api, Resource
+
+
+ALLOWED_TAGS = [
+    "a",
+    "abbr",
+    "acronym",
+    "b",
+    "blockquote",
+    "code",
+    "em",
+    "i",
+    "li",
+    "ol",
+    "strong",
+    "ul",
+    "span",
+    "p",
+    "br",
+    "div",
+]
+ALLOWED_ATTRIBUTES = {
+    "a": ["href", "title", "style"],
+    "abbr": ["title", "style"],
+    "acronym": ["title", "style"],
+    "p": ["style"],
+    "div": ["style"],
+}
 
 
 def get_db():
@@ -61,9 +89,7 @@ def create_app():
 
     @app.route("/api/attachment/<string:message_id>/<int:num>")
     def download_attachment(message_id, num):
-        msgs = notmuch.Query(
-            get_db(), "mid:{}".format(message_id)
-        ).search_messages()
+        msgs = notmuch.Query(get_db(), "mid:{}".format(message_id)).search_messages()
         msg = next(msgs)  # there can be only 1
         d = message_attachment(msg, num)
         if not d:
@@ -115,6 +141,16 @@ def message_to_json(message):
                 }
             )
     msg_body = email_msg.get_body(preferencelist=("html", "plain"))
+    content_type = msg_body.get_content_type()
+    if content_type == "text/html":
+        content = bleach.clean(
+            msg_body.get_content(),
+            tags=ALLOWED_TAGS,
+            attributes=ALLOWED_ATTRIBUTES,
+            strip=True,
+        )
+    else:
+        content = msg_body.get_content()
     return {
         "from": email_msg["From"],
         "to": email_msg["To"],
@@ -122,8 +158,8 @@ def message_to_json(message):
         "bcc": email_msg["BCC"],
         "date": email_msg["Date"],
         "subject": email_msg["Subject"],
-        "content": msg_body.get_content(),
-        "content_type": msg_body.get_content_type(),
+        "content": content,
+        "content_type": content_type,
         "attachments": attachments,
         "message_id": message.get_message_id(),
     }

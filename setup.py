@@ -15,5 +15,5 @@ setup(
     long_description_content_type="text/markdown",
     license="MIT",
     packages=find_packages(),
-    install_requires=["flask", "flask-restful", "flask-cors"],
+    install_requires=["flask", "flask-restful", "flask-cors", "bleach"],
 )
