@@ -1,18 +1,17 @@
 """Flask web app providing a REST API to notmuch."""
 
-
-import bleach
 import email
 import email.policy
 import io
+import itertools
 import logging
 import os
 
+import bleach
 import notmuch
 from flask import Flask, current_app, g, send_file
 from flask_cors import CORS
 from flask_restful import Api, Resource
-
 
 ALLOWED_TAGS = [
     "a",
@@ -73,7 +72,7 @@ def create_app():
     class Query(Resource):
         def get(self, query_string):
             threads = notmuch.Query(get_db(), query_string).search_threads()
-            return threads_to_json(threads)
+            return threads_to_json(threads, number=None)
 
     class Thread(Resource):
         def get(self, thread_id):
@@ -101,9 +100,10 @@ def create_app():
     return app
 
 
-def threads_to_json(threads):
+def threads_to_json(threads, start=0, number=None):
     """Converts a list of `notmuch.threads.Threads` instances to a JSON object."""
-    return [thread_to_json(t) for t in threads]
+    my_threads = itertools.islice(threads, start, start + number)
+    return [thread_to_json(t) for t in my_threads]
 
 
 def thread_to_json(thread):
