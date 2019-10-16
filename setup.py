@@ -7,7 +7,7 @@ with open("README.md") as f:
 
 setup(
     name="netviel",
-    version="0.1",
+    version="0.1.1",
     author="David M. Straub <straub@protonmail.com>",
     author_email="straub@protonmail.com",
     url='https://github.com/DavidMStraub/netviel',
