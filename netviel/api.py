@@ -9,7 +9,7 @@ import os
 
 import bleach
 import notmuch
-from flask import Flask, current_app, g, send_file
+from flask import Flask, current_app, g, send_file, send_from_directory
 from flask_cors import CORS
 from flask_restful import Api, Resource
 
@@ -54,7 +54,7 @@ def close_db(e=None):
 
 def create_app():
     """Flask application factory."""
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="../js")
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["NOTMUCH_PATH"] = os.getenv("NOTMUCH_PATH")
     app.logger.setLevel(logging.INFO)
@@ -62,6 +62,16 @@ def create_app():
     CORS(app)
 
     api = Api(app)
+
+    @app.route("/")
+    def send_index():
+        return send_from_directory(app.static_folder, "index.html")
+
+    @app.route("/<path:path>")
+    def send_js(path):
+        if path and os.path.exists(os.path.join(app.static_folder, path)):
+            return send_from_directory(app.static_folder, path)
+        return send_from_directory(app.static_folder, "index.html")
 
     @app.before_request
     def before_request():
