@@ -12,6 +12,12 @@ Technically, it is a single-page web app (based on the [Open WC Starter App](htt
 python3 -m pip install netviel --user
 ```
 
+## Screenshots
+
+![](netviel.gif)
+
+(Nonsensical e-mails generated with the help of [Faker](https://github.com/joke2k/faker).)
+
 ## Requirements
 
 You need to have `notmuch` installed with its Python bindings. On Debian-based systems, this is achieved with
