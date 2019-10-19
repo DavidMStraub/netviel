@@ -54,7 +54,7 @@ def close_db(e=None):
 
 def create_app():
     """Flask application factory."""
-    app = Flask(__name__, static_folder="../js")
+    app = Flask(__name__, static_folder="js")
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["NOTMUCH_PATH"] = os.getenv("NOTMUCH_PATH")
     app.logger.setLevel(logging.INFO)
