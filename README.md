@@ -23,7 +23,7 @@ python3 -m pip install netviel --user
 You need to have `notmuch` installed with its Python bindings. On Debian-based systems, this is achieved with
 
 ```
-sudo apt install notmuch
+sudo apt install notmuch python3-notmuch
 ```
 
 Python 3.6 or above is required.
