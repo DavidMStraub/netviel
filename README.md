@@ -18,6 +18,12 @@ python3 -m pip install netviel --user
 
 (Nonsensical e-mails generated with the help of [Faker](https://github.com/joke2k/faker).)
 
+## Demo
+
+[See here for a demo instance](https://glacial-castle-83891.herokuapp.com/) with random e-mails (but no attachments or HTML e-mails, which net viel supports as well).
+
+Note that the initial startup of the demo could take up to half a minute until the Heroku dyno (free tier) wakes up, after that it should be snappy.
+
 ## Requirements
 
 You need to have `notmuch` installed with its Python bindings. On Debian-based systems, this is achieved with
