@@ -103,7 +103,10 @@ def create_app():
         d = message_attachment(msg, num)
         if not d:
             return None
-        f = io.BytesIO(d["content"])
+        if isinstance(d["content"], str):
+            f = io.BytesIO(d["content"].encode())
+        else:
+            f = io.BytesIO(d["content"])
         f.seek(0)
         return send_file(f, mimetype=d["content_type"])
 
@@ -153,7 +156,7 @@ def message_to_json(message):
     for part in email_msg.walk():
         if part.get_content_maintype() == "multipart":
             continue
-        if part.get_content_disposition() == "attachment":
+        if part.get_content_disposition() in ["attachment", "inline"]:
             attachments.append(
                 {
                     "filename": part.get_filename(),
@@ -193,7 +196,7 @@ def message_attachment(message, num):
     for part in email_msg.walk():
         if part.get_content_maintype() == "multipart":
             continue
-        if part.get_content_disposition() == "attachment":
+        if part.get_content_disposition() in ["attachment", "inline"]:
             attachments.append(part)
     if not attachments:
         return {}
