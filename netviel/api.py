@@ -76,6 +76,14 @@ def create_app():
 
     app.teardown_appcontext(close_db)
 
+    @app.after_request
+    def security_headers(response):
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        return response
+
     class Query(Resource):
         def get(self, query_string):
             threads = notmuch.Query(get_db(), query_string).search_threads()
