@@ -9,7 +9,7 @@ import os
 
 import bleach
 import notmuch
-from flask import Flask, current_app, g, send_file, send_from_directory
+from flask import Flask, current_app, g, send_file, send_from_directory, safe_join
 from flask_restful import Api, Resource
 
 ALLOWED_TAGS = [
@@ -66,7 +66,7 @@ def create_app():
 
     @app.route("/<path:path>")
     def send_js(path):
-        if path and os.path.exists(os.path.join(app.static_folder, path)):
+        if path and os.path.exists(safe_join(app.static_folder, path)):
             return send_from_directory(app.static_folder, path)
         return send_from_directory(app.static_folder, "index.html")
 
@@ -109,10 +109,9 @@ def create_app():
         if not d:
             return None
         if isinstance(d["content"], str):
-            f = io.BytesIO(d["content"].encode())
+            f = io.StringIO(d["content"])
         else:
             f = io.BytesIO(d["content"])
-        f.seek(0)
         return send_file(f, mimetype=d["content_type"], as_attachment=True,
             attachment_filename=d["filename"])
 
@@ -179,8 +178,10 @@ def message_to_json(message):
             attributes=ALLOWED_ATTRIBUTES,
             strip=True,
         )
-    else:
+    elif content_type == "text/plain":
         content = msg_body.get_content()
+    else:
+        return {}
     return {
         "from": email_msg["From"],
         "to": email_msg["To"],
