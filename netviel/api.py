@@ -105,13 +105,15 @@ def create_app():
         else:
             f = io.BytesIO(d["content"])
         f.seek(0)
-        return send_file(f, mimetype=d["content_type"])
+        return send_file(f, mimetype=d["content_type"], as_attachment=True,
+            attachment_filename=d["filename"])
 
     @app.route("/api/message/<string:message_id>")
     def download_message(message_id):
         msgs = notmuch.Query(get_db(), "mid:{}".format(message_id)).search_messages()
         msg = next(msgs)  # there can be only 1
-        return send_file(msg.get_filename(), mimetype="message/rfc822")
+        return send_file(msg.get_filename(), mimetype="message/rfc822",
+            as_attachment=True, attachment_filename=message_id+".eml")
 
     return app
 
@@ -199,6 +201,7 @@ def message_attachment(message, num):
         return {}
     attachment = attachments[num]
     return {
+        "filename": attachment.get_filename(),
         "content_type": attachment.get_content_type(),
         "content": attachment.get_content(),
     }
