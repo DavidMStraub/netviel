@@ -98,7 +98,7 @@ def create_app():
             messages = thread.get_messages()
             return messages_to_json(messages)
 
-    api.add_resource(Query, "/api/query/<string:query_string>")
+    api.add_resource(Query, "/api/query/<path:query_string>")
     api.add_resource(Thread, "/api/thread/<string:thread_id>")
 
     @app.route("/api/attachment/<string:message_id>/<int:num>")
