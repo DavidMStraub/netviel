@@ -10,6 +10,7 @@ import os
 import bleach
 import notmuch
 from flask import Flask, current_app, g, send_file, send_from_directory, safe_join
+from flask_cors import CORS
 from flask_restful import Api, Resource
 
 ALLOWED_TAGS = [
@@ -57,6 +58,11 @@ def create_app():
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["NOTMUCH_PATH"] = os.getenv("NOTMUCH_PATH")
     app.logger.setLevel(logging.INFO)
+
+    if app.debug:
+        print("\nDebug mode. Your data could be accessed by any other website "
+              "you load on the same machine.\n")
+        CORS(app)
 
     api = Api(app)
 
