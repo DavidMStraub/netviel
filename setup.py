@@ -23,5 +23,5 @@ setup(
     license="MIT",
     packages=find_packages(),
     package_data={"netviel": PACKAGE_DATA},
-    install_requires=["flask", "flask-restful", "bleach"],
+    install_requires=["flask", "flask-cors", "flask-restful", "bleach"],
 )
