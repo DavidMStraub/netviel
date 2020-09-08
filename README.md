@@ -46,4 +46,4 @@ The Flask default port 5000 can be changed with the `--ports` option.
 
 ## Development
 
-To run net viel locally and make changes to the code, follow intructions on [this page](docs/developers).
+To run net viel locally and make changes to the code, follow intructions on [this page](docs/developers.md).
