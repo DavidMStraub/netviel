@@ -17,7 +17,7 @@ And clone them to your computer.
 
 Build it like so:
 
-`cd netviel && python3 setup.py build`
+`cd netviel && python3 -m pip install -e . --user`
 
 ## Prepare the frontend
 
@@ -37,7 +37,7 @@ Then use NVM to install the latest NPM, and use it in the frontend directory you
 
 Run the backend first:
 
-`cd netviel && export FLASK_DEBUG=1 && python3 -m pip install -e . --user && python3 -m netviel`
+`cd netviel && export FLASK_DEBUG=1 && python3 -m netviel`
 
 (this avoids the need for admin rights). In a separate terminal, run the frontend:
 
