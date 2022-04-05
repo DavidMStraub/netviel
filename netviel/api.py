@@ -9,7 +9,8 @@ import os
 
 import bleach
 import notmuch
-from flask import Flask, current_app, g, send_file, send_from_directory, safe_join
+from flask import Flask, current_app, g, send_file, send_from_directory
+from werkzeug.security import safe_join
 from flask_cors import CORS
 from flask_restful import Api, Resource
 
