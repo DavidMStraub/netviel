@@ -9,9 +9,11 @@ import os
 
 import bleach
 import notmuch
-from flask import Flask, current_app, g, send_file, send_from_directory, safe_join
+from flask import Flask, current_app, g, send_file, send_from_directory
 from flask_cors import CORS
 from flask_restful import Api, Resource
+
+from werkzeug.utils import safe_join
 
 ALLOWED_TAGS = [
     "a",
@@ -126,7 +128,7 @@ def create_app():
         msgs = notmuch.Query(get_db(), "mid:{}".format(message_id)).search_messages()
         msg = next(msgs)  # there can be only 1
         return send_file(msg.get_filename(), mimetype="message/rfc822",
-            as_attachment=True, attachment_filename=message_id+".eml")
+            as_attachment=True, download_name=message_id+".eml")
 
     return app
 
