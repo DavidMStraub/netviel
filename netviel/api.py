@@ -128,7 +128,7 @@ def create_app():
         msgs = notmuch.Query(get_db(), "mid:{}".format(message_id)).search_messages()
         msg = next(msgs)  # there can be only 1
         return send_file(msg.get_filename(), mimetype="message/rfc822",
-            as_attachment=True, attachment_filename=message_id+".eml")
+            as_attachment=True, download_name=message_id+".eml")
 
     return app
 
