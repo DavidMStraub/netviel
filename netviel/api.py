@@ -9,9 +9,11 @@ import os
 
 import bleach
 import notmuch
-from flask import Flask, current_app, g, send_file, send_from_directory, safe_join
+from flask import Flask, current_app, g, send_file, send_from_directory
 from flask_cors import CORS
 from flask_restful import Api, Resource
+
+from werkzeug.utils import safe_join
 
 ALLOWED_TAGS = [
     "a",
