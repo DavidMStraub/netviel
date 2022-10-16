@@ -14,7 +14,7 @@ PACKAGE_DATA = [f for f in PACKAGE_DATA if os.path.isfile(os.path.join("netviel"
 
 setup(
     name="netviel",
-    version="0.2",
+    version="0.2.1",
     author="David M. Straub <straub@protonmail.com>",
     author_email="straub@protonmail.com",
     url="https://github.com/DavidMStraub/netviel",
