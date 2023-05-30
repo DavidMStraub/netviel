@@ -121,7 +121,7 @@ def create_app():
         else:
             f = io.BytesIO(d["content"])
         return send_file(f, mimetype=d["content_type"], as_attachment=True,
-            attachment_filename=d["filename"])
+            download_name=d["filename"])
 
     @app.route("/api/message/<string:message_id>")
     def download_message(message_id):
@@ -142,15 +142,16 @@ def threads_to_json(threads, start=0, number=None):
     my_threads = itertools.islice(threads, start, stop)
     return [thread_to_json(t) for t in my_threads]
 
-
 def thread_to_json(thread):
     """Converts a `notmuch.threads.Thread` instance to a JSON object."""
+    authors = thread.get_authors()
+    subject = thread.get_subject()
     return {
-        "authors": thread.get_authors(),
+        "authors": authors if authors else "",
         "matched_messages": thread.get_matched_messages(),
         "newest_date": thread.get_newest_date(),
         "oldest_date": thread.get_oldest_date(),
-        "subject": thread.get_subject(),
+        "subject": subject if subject else "",
         "tags": list(thread.get_tags()),
         "thread_id": thread.get_thread_id(),
         "total_messages": thread.get_total_messages(),
